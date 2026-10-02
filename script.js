@@ -480,11 +480,11 @@ function initIntroGate() {
     });
 
     // lily petals swirling outward
-    const petalFills = [
-      'linear-gradient(#D8BEF4, #7B4BB0)',
-      'linear-gradient(#F4C6E0, #B25C9A)',
-      'linear-gradient(#FFFFFF, #CBB2EE)',
-      'linear-gradient(#C7A6EE, #5D2F8F)'
+      const petalFills = [
+      'linear-gradient(#EADCFB, #B99CE8)',
+      'linear-gradient(#F8E3F0, #E6A8CC)',
+      'linear-gradient(#FFFFFF, #D9C3F5)',
+      'linear-gradient(#E3CBEF, #9C7BD6)'
     ];
     const petalCount = mobile ? 16 : 28;
     for (let i = 0; i < petalCount; i++) {
@@ -596,16 +596,19 @@ function initIntroGate() {
       fill: 'both'
     });
 
-    anim.onfinish = () => {
-      const field = $('butterflyField');
-      const total = isMobile() ? 7 : 15;
-      if (!field || field.children.length >= total) {
+      anim.onfinish = () => {
+        const field = $('butterflyField');
+        const total = isMobile() ? 7 : 15;
+        const stay = field && field.children.length < total;
+        el.style.opacity = '0';
+        setTimeout(() => {
         el.remove();
-        return;
-      }
-      field.appendChild(el);
-      anim.cancel();
-      wander(el, { x: last.x, y: last.y }, finalAngle);
+        if (stay) {
+          el.style.opacity = '';
+          field.appendChild(el);
+          wander(el, { x: last.x, y: last.y }, finalAngle);
+        }
+      }, 50);
     };
   }
 
@@ -675,7 +678,7 @@ function initIntroGate() {
 const TRADITIONS = {
   candles: {
     title: '18 Candles',
-    tagline: 'Eighteen people whose light has guided her here. Each candle is lit in someone’s honor.',
+    tagline: 'Eighteen people who’ve been a steady light in Elaine’s life, each lighting a candle in that person’s honor.',
     names: [
       'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here',
       'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here',
@@ -684,7 +687,7 @@ const TRADITIONS = {
   },
   roses: {
     title: '18 Roses',
-    tagline: 'Eighteen roses, each carried by someone close to her heart, with a wish for the years ahead.',
+    tagline: 'Eighteen roses from eighteen people close to her, each one handed over with a wish for what’s next.',
     names: [
       'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here',
       'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here',
@@ -693,7 +696,7 @@ const TRADITIONS = {
   },
   treasures: {
     title: '18 Treasures',
-    tagline: 'Eighteen treasures, each a token of love to carry into adulthood.',
+    tagline: 'Eighteen small gifts standing in for the advice behind them — practical stuff for the years ahead.',
     names: [
       'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here',
       'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here',
@@ -702,7 +705,7 @@ const TRADITIONS = {
   },
   shots: {
     title: '18 Shots',
-    tagline: 'Eighteen rounds shared with the friends who keep the celebration lively.',
+    tagline: 'Eighteen rounds with the friends who show up for exactly this kind of thing.',
     names: [
       'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here',
       'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here',
@@ -711,7 +714,7 @@ const TRADITIONS = {
   },
   bills: {
     title: '18 Blue Bills',
-    tagline: 'Eighteen tokens of blessing, given with love to carry her into adulthood.',
+    tagline: 'Eighteen bills, each one a small blessing for whatever Elaine builds next.',
     names: [
       'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here',
       'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here', 'Name Here',
@@ -908,7 +911,6 @@ function initCountdown() {
   const elHours = $('cdHours');
   const elMinutes = $('cdMinutes');
   const elSeconds = $('cdSeconds');
-  const note = $('countdownNote');
   if (!elDays) return;
 
   const cells = {
@@ -919,15 +921,13 @@ function initCountdown() {
   };
   const ring = (cell, p) => cell && cell.style.setProperty('--p', clamp(p, 0, 1).toFixed(4));
 
-  note.textContent = 'The exact time will be confirmed once the venue is announced.';
-
   function tick() {
     const diff = target - Date.now();
 
     if (diff <= 0) {
       [elDays, elHours, elMinutes, elSeconds].forEach((el) => (el.textContent = '00'));
       Object.values(cells).forEach((c) => ring(c, 1));
-      note.textContent = 'Today is the day! 🎉';
+      note.textContent = 'It’s today! 🎉';
       clearInterval(timer);
       return;
     }
@@ -1016,12 +1016,12 @@ function initForm() {
     if (action.includes('REPLACE_WITH_EMAIL')) {
       e.preventDefault();
       status.textContent =
-        'Form not yet connected — replace REPLACE_WITH_EMAIL in the form action with the real address.';
+        'Form isn’t connected yet — swap REPLACE_WITH_EMAIL in the form action for the real address.';
       return;
     }
 
     e.preventDefault();
-    status.textContent = 'Sending your RSVP...';
+    status.textContent = 'Sending it now…';
 
     try {
       const formData = new FormData(form);
@@ -1031,15 +1031,15 @@ function initForm() {
         headers: { Accept: 'application/json' }
       });
       if (res.ok) {
-        status.textContent = 'Thank you! Your RSVP has been sent. 💌';
+        status.textContent = 'Got it, thank you! 💌';
         form.reset();
         guestsField.classList.remove('is-hidden');
         input.disabled = false;
       } else {
-        status.textContent = 'Something went wrong. Please try again.';
+        status.textContent = 'That didn’t go through — try again?';
       }
     } catch (err) {
-      status.textContent = 'Something went wrong. Please check your connection and try again.';
+      status.textContent = 'Couldn’t send that — check your connection and try again.';
     }
   });
 }
